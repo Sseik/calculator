@@ -46,7 +46,7 @@ function pressBack() {
   } else {
     firstOperand = firstOperand.slice(0, -1);
   }
-  display.textContent = `${firstOperand} ${operator || ""}`;
+  display.textContent = `${firstOperand} ${operator || ""} ${secondOperand}`;
 }
 
 function pressEquals() {
