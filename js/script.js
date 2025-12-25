@@ -28,13 +28,11 @@ function pressNumber(number) {
   } else {
     firstOperand += number;
   }
-  display.textContent = `${firstOperand} ${operator || ""} ${secondOperand}`;
 }
 
 function pressOperator(pressedOperator) {
   if (!secondOperand.length && !isNaN(+firstOperand)) {
     operator = pressedOperator;
-    display.textContent = `${firstOperand} ${operator || ""}`;
   }
 }
 
@@ -46,13 +44,11 @@ function pressBack() {
   } else {
     firstOperand = firstOperand.slice(0, -1);
   }
-  display.textContent = `${firstOperand} ${operator || ""} ${secondOperand}`;
 }
 
 function pressEquals() {
   if (!isNaN(+firstOperand) && !isNaN(+secondOperand) && operator) {
-    display.textContent = operate(operator, +firstOperand, +secondOperand);
-    firstOperand = "";
+    firstOperand = operate(operator, +firstOperand, +secondOperand);
     secondOperand = "";
     operator = null;
   }
@@ -68,19 +64,16 @@ function pressDot() {
       firstOperand += ".";
     }
   }
-  display.textContent = `${firstOperand} ${operator || ""} ${secondOperand}`;
 }
 
 function pressClear() {
   firstOperand = "";
   secondOperand = "";
   operator = null;
-  display.textContent = "";
 }
 
-document.querySelector("#buttonsContainer").addEventListener("click", (e) => {
-  if (e.target.id === "buttonsContainer") return;
-  switch (e.target.textContent) {
+function updateDisplay(pressedValue) {
+  switch (pressedValue) {
     case "=":
       pressEquals();
       break;
@@ -97,9 +90,32 @@ document.querySelector("#buttonsContainer").addEventListener("click", (e) => {
     case "-":
     case "*":
     case "/":
-      pressOperator(e.target.textContent);
+      pressOperator(pressedValue);
       break;
-    default:
-      pressNumber(e.target.textContent);
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      pressNumber(pressedValue);
   }
+  display.textContent = `${firstOperand} ${operator || ""} ${secondOperand}`;
+}
+
+document.querySelector("#buttonsContainer").addEventListener("click", (e) => {
+  if (e.target.id === "buttonsContainer") return;
+  updateDisplay(e.target.textContent);
+});
+
+document.addEventListener("keydown", (e) => {
+  let pressedValue = e.key;
+  if (pressedValue === "Backspace") pressedValue = "←";
+  if (pressedValue === "Enter") pressedValue = "=";
+  if (pressedValue === "Delete") pressedValue = "Clear";
+  updateDisplay(pressedValue);
 });
