@@ -31,9 +31,14 @@ function pressNumber(number) {
 }
 
 function pressOperator(pressedOperator) {
-  if (!secondOperand.length && !isNaN(+firstOperand)) {
+  if (pressedOperator === "-" && operator && !secondOperand.length) {
+    secondOperand = "(";
+    return false;
+  }
+  if (!secondOperand.length && firstOperand.length) {
     operator = pressedOperator;
   }
+  return operator;
 }
 
 function pressBack() {
@@ -47,8 +52,12 @@ function pressBack() {
 }
 
 function pressEquals() {
-  if (!isNaN(+firstOperand) && !isNaN(+secondOperand) && operator) {
-    firstOperand = operate(operator, +firstOperand, +secondOperand);
+  if (firstOperand.length && secondOperand.length && operator) {
+    firstOperand = operate(
+      operator,
+      +firstOperand,
+      +secondOperand.split("").filter((item) => !"()".includes(item)).join("")
+    ).toString();
     secondOperand = "";
     operator = null;
   }
@@ -57,10 +66,12 @@ function pressEquals() {
 function pressDot() {
   if (operator) {
     if (secondOperand.indexOf(".") === -1) {
+      if (!secondOperand.length) secondOperand = "0";
       secondOperand += ".";
     }
   } else {
     if (firstOperand.indexOf(".") === -1) {
+      if (!firstOperand.length) firstOperand = "0";
       firstOperand += ".";
     }
   }
@@ -87,11 +98,14 @@ function updateDisplay(pressedValue) {
       pressBack();
       break;
     case "+":
-    case "-":
     case "*":
     case "/":
       pressOperator(pressedValue);
       break;
+    case "-":
+      if (pressOperator(pressedValue)) {
+        break;
+      }
     case "0":
     case "1":
     case "2":
